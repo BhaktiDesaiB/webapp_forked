@@ -93,11 +93,11 @@ async function loadUsersFromCSV() {
   // Synchronize the database and load data
   sequelize.sync({ force: false })
     .then(() => {
-      console.log('Database synced successfully.');
+      // console.log('Database synced successfully.');
       loadUsersFromCSV();
     })
     .catch((error) => {
-      console.error('Error syncing database:', error);
+      // console.error('Error syncing database:', error);
     });
 
 
