@@ -25,6 +25,7 @@
 !.nycrc
 !.yamllint.yaml
 
+/node_modules/
 # === Rules for root dir ===
 /core
 /vgcore.*
