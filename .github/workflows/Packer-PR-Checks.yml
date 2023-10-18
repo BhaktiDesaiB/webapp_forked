@@ -1,6 +1,13 @@
 name: Packer-PR-Checks
 on:
   pull_request:
+    branches:
+      - main
+    types:
+      - opened
+  pull_request_target:
+    branches:
+      - main
     types:
       - opened
 jobs:
