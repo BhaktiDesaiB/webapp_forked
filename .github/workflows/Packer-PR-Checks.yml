@@ -1,6 +1,8 @@
 name: Packer-PR-Checks
 on:
   pull_request:
+    types:
+      - opened
 jobs:
   packer_checks:
     runs-on: ubuntu-latest
