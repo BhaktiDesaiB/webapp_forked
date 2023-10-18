@@ -46,7 +46,7 @@ sudo mysql -u root -p"$ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON *.* TO '$NEW_U
 sudo mysql -u root -p"$ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
 
 sudo mkdir -p /BhaktiBharat_Desai_002701264_03
-sudo sudo chmod 755 /BhaktiBharat_Desai_002701264_03
+sudo chmod 755 /BhaktiBharat_Desai_002701264_03
 sudo unzip BhaktiBharat_Desai_002701264_03 -d BhaktiBharat_Desai_002701264_03_webapp
 
 # cd ~/BhaktiBharat_Desai_002701264_03

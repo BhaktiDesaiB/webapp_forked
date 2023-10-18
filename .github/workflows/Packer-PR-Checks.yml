@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+      - try1
     types:
       - opened
   pull_request_target:
@@ -11,8 +12,6 @@ on:
     types:
       - opened
 jobs:
-  build:
-    name : pr check
   packer_checks:
     runs-on: ubuntu-latest
     steps:
