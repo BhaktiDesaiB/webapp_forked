@@ -4,9 +4,10 @@ on:
   pull_request:
     branches:
       - main
-  # pull_request_target:
-  #   branches:
-  #     - main
+      - try1
+  pull_request_target:
+    branches:
+      - main
 jobs:
   build:
     name : intergration
