@@ -45,7 +45,6 @@ sudo mysql -u root -p"$ROOT_PASSWORD" -e "CREATE USER '$NEW_USER'@'localhost' ID
 sudo mysql -u root -p"$ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON *.* TO '$NEW_USER'@'localhost' WITH GRANT OPTION;"
 sudo mysql -u root -p"$ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
 
-
 sudo mkdir -p /BhaktiBharat_Desai_002701264_03
 sudo sudo chmod 755 /BhaktiBharat_Desai_002701264_03
 sudo unzip BhaktiBharat_Desai_002701264_03 -d BhaktiBharat_Desai_002701264_03_webapp
@@ -54,6 +53,7 @@ sudo unzip BhaktiBharat_Desai_002701264_03 -d BhaktiBharat_Desai_002701264_03_we
 
 # Unzip the file to the destination directory
 # sudo unzip "$ZIP_FILE" -d "DEST_DIR"
+
 
 sudo npm install
 

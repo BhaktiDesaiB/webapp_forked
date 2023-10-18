@@ -235,10 +235,8 @@ app.delete('/assignments/:id', basicAuth, async (req, res) => {
 
 
 
-
-
-app.listen(process.env.PORT, () => {
+const port = app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
   });
 
-  module.exports = app;
+module.exports = {app , port};

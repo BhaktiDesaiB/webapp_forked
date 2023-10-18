@@ -1,4 +1,5 @@
 name: Build AMI with Packer
+
 on:
   pull_request:
     branches:
@@ -11,6 +12,8 @@ on:
     types:
       - closed
 jobs:
+  build:
+    name : build ami
   create-zip:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
@@ -20,6 +23,8 @@ jobs:
       - name: Create Zip Archive
         run: |
           zip -r BhaktiBharat_Desai_002701264_03.zip ./
+          echo "pwd"
+          pwd
       - name: Build AMI
         run: |
           packer init ./packer/aws-debian.pkr.hcl

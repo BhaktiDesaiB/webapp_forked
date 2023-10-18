@@ -11,6 +11,8 @@ on:
     types:
       - opened
 jobs:
+  build:
+    name : pr check
   packer_checks:
     runs-on: ubuntu-latest
     steps:

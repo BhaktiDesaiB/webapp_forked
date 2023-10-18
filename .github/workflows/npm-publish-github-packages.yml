@@ -4,14 +4,12 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - closed
   pull_request_target:
     branches:
       - main
-    types:
-      - closed
 jobs:
+  build:
+    name : intergration
   deploy:
     runs-on: ubuntu-latest
 
