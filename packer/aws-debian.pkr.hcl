@@ -24,8 +24,8 @@ build {
     script = "./setup.sh"
   }
   provisioner "file" {
-    source      = "./BhaktiBharat_Desai_002701264_03.zip"
-    destination = "/BhaktiBharat_Desai_002701264_03.zip"
+    source      = "BhaktiBharat_Desai_002701264_03.zip"
+    destination = "~/BhaktiBharat_Desai_002701264_03"
   }
 
 }
