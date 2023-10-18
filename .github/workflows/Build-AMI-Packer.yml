@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Create Zip Archive
         run: |
-          zip -r /tmp/BhaktiBharat_Desai_002701264_03.zip .
+          zip -r BhaktiBharat_Desai_002701264_03.zip .
       - name: Build AMI
         run: |
           packer init ./packer/aws-debian.pkr.hcl
