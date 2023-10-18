@@ -21,7 +21,7 @@ build {
     "source.amazon-ebs.debian"
   ]
   provisioner "shell" {
-    script = "../setup.sh"
+    script = "./setup.sh"
   }
   provisioner "file" {
     source      = "./BhaktiBharat_Desai_002701264_03.zip"

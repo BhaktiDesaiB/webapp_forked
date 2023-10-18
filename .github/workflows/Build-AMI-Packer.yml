@@ -1,6 +1,13 @@
 name: Build AMI with Packer
 on:
   pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  pull_request_target:
+    branches:
+      - main
     types:
       - closed
 jobs:
