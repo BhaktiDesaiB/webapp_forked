@@ -1,0 +1,24 @@
+name: Build AMI with Packer
+on:
+  pull_request:
+    types:
+      - closed
+jobs:
+  create-zip:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Create Zip Archive
+        run: |
+          zip -r BhaktiBharat_Desai_002701264_03.zip .
+      - name: Build AMI
+        run: |
+          packer init ./packer/aws-debian.pkr.hcl
+          packer fmt ./packer/aws-debian.pkr.hcl
+          packer validate ./packer/aws-debian.pkr.hcl
+          packer build ./packer/aws-debian.pkr.hcl
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
