@@ -26,7 +26,7 @@ app.get('/healthz', async (req, res) => {
   
       res.status(200).json();
     } catch (error) {
-      console.error('error info', error);
+      // console.error('error info', error);
       res.status(503).send();
     }
   });
@@ -40,7 +40,7 @@ app.get('/assignments', basicAuth, async (req, res) => {
     // Send the retrieved assignments as a JSON response
     res.status(200).json(assignments);
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     res.status(503).json();
   }
 });
@@ -93,7 +93,7 @@ app.post('/assignments', basicAuth, async (req, res) => {
     // Return the response payload in the JSON response
     res.status(201).json(responsePayload);
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     res.status(400).json();
   }
 });
@@ -151,7 +151,7 @@ app.put('/assignments/:id', basicAuth, async (req, res) => {
 
     // Concatenate user ID and assignment ID with an underscore ('_')
     const concatenatedId = `${user.id}_${assignment.id}`;
-    console.log(concatenatedId);
+    // console.log(concatenatedId);
 
     // Use Sequelize to find the concatenated ID in the Assignment_links table
     const assignmentLink = await Assignment_links.findOne({ where: { id: concatenatedId } });
@@ -175,7 +175,7 @@ app.put('/assignments/:id', basicAuth, async (req, res) => {
     // Return the updated assignment as a JSON response
     res.status(200).json(assignment);
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     res.status(503).json();
   }
 });
@@ -228,7 +228,7 @@ app.delete('/assignments/:id', basicAuth, async (req, res) => {
     // Return a success message as a JSON response
     res.status(200).json();
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     res.status(503).json();
   }
 });
@@ -236,7 +236,7 @@ app.delete('/assignments/:id', basicAuth, async (req, res) => {
 
 
 const port = app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
+    // console.log(`Server is running on port ${process.env.PORT}`);
   });
 
 module.exports = {app , port};
