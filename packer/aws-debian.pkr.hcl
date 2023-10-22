@@ -9,11 +9,11 @@ packer {
 
 source "amazon-ebs" "debian" {
   ami_name      = "db_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
-  source_ami    = "ami-06db4d78cb1d3bbf9" # Replace with the correct Debian 12 AMI ID
+source_ami    = "ami-06db4d78cb1d3bbf9" # Replace with the correct Debian 12 AMI ID
   instance_type = "t2.micro"
   region        = "us-east-1"
   ssh_username  = "admin"
-  profile       = "dev"
+  profile       = "demo"
 }
 
 build {
