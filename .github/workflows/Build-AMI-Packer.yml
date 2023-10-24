@@ -21,7 +21,7 @@ jobs:
         working-directory: ${{ github.workspace }}
       - name: Create Zip Archive
         run: |
-          zip -r bhaktidesai_002701264_05.zip .
+          zip -r bhaktidesai_002701264_05.zip ./
         working-directory: ${{ github.workspace }}
       - name: Build AMI
         run: |
