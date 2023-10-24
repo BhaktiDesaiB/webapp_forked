@@ -47,10 +47,10 @@ const User = sequelize.define('UserTable', {
 
 sequelize.sync()
   .then(() => {
-    // console.log('Users Table synced successfully.');
+    console.log('Users Table synced successfully.');
   })
   .catch((error) => {
-    // console.error('Error syncing Users Table:', error);
+    console.error('Error syncing Users Table:', error);
   });
 
 // Function to load data from CSV file and create user accounts
@@ -83,21 +83,21 @@ async function loadUsersFromCSV() {
           }
         })
         .on('end', () => {
-          // console.log('Users loaded successfully.');
+          console.log('Users loaded successfully.');
         });
     } catch (error) {
-      // console.error('Error loading users:', error);
+      console.error('Error loading users:', error);
     }
   }
   
   // Synchronize the database and load data
   sequelize.sync({ force: false })
     .then(() => {
-      // console.log('Database synced successfully.');
+      console.log('Database synced successfully.');
       loadUsersFromCSV();
     })
     .catch((error) => {
-      // console.error('Error syncing database:', error);
+      console.error('Error syncing database:', error);
     });
 
 

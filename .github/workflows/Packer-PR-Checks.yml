@@ -1,16 +1,8 @@
-name: Packer-PR-Checks
+name: Packer-Checks
 on:
   pull_request:
     branches:
       - main
-      - try1
-    types:
-      - opened
-  pull_request_target:
-    branches:
-      - main
-    types:
-      - opened
 jobs:
   packer_checks:
     runs-on: ubuntu-latest
@@ -19,11 +11,11 @@ jobs:
         uses: actions/checkout@v2
       - name: Create Zip Archive
         run: |
-          zip -r BhaktiBharat_Desai_002701264_03.zip .
+          zip -r bhaktidesai_002701264_05.zip .
       - name: Run Packer init
-        run: packer init ./packer/aws-debian.pkr.hcl
+        run: packer init ./packer/aws-debian.pkr,hcl
       - name: Run packer fmt
-        run: packer fmt ./packer/aws-debian.pkr.hcl
+        run: packer fmt ./packer/aws-debian.pkr,hcl
       - name: Check for changes
         id: git-diff
         run: |
@@ -32,11 +24,11 @@ jobs:
             exit 1;
           }
       - name: Run packer validate
-        run: packer validate ./packer/aws-debian.pkr.hcl
+        run: packer validate ./packer/aws-debian.pkr,hcl
       - name: Check validation status
         id: validate-status
         run: |
-          if [[ $(packer validate ./packer/aws-debian.pkr.hcl) == *"The configuration is valid."* ]]; then
+          if [[ $(packer validate ./packer/aws-debian.pkr,hcl) == *"The configuration is valid."* ]]; then
             echo "Packer template validation succeeded."
           else
             echo "Packer template validation failed. Please fix any issues before merging."
@@ -44,4 +36,5 @@ jobs:
           fi
       - name: Final checks
         if: ${{ steps.validate-status.outcome == 'success' }}
-        run: echo "All checks passed. Ready to merge."
+        run: echo "All checks passed."
+        

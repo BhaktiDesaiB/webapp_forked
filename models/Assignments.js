@@ -59,10 +59,10 @@ const Assignment_links = sequelize.define('Assignment_links', {
 
 sequelize.sync()
   .then(() => {
-    // console.log('Assignment Table synced successfully.');
+    console.log('Assignment Table synced successfully.');
   })
   .catch((error) => {
-    // console.error('Error syncing Assignment Table:', error);
+    console.error('Error syncing Assignment Table:', error);
   });
 
   module.exports = {

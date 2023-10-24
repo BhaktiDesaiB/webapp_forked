@@ -27,7 +27,6 @@ async function basicAuth(req, res, next) {
         res.status(401).json({ error: 'Unauthorized: Invalid credentials' });
         return;
       }
-
       // Authentication successful
       next();
     });
