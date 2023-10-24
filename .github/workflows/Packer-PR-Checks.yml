@@ -1,8 +1,15 @@
-name: Packer-Checks
+name: Packer-PR-Checks
 on:
   pull_request:
     branches:
       - main
+    types:
+      - opened
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
 jobs:
   packer_checks:
     runs-on: ubuntu-latest
