@@ -77,7 +77,7 @@ build {
   ]
   provisioner "file" {
     source      = "bhaktidesai_002701264_05.zip"
-    destination = "~/bhaktidesai_002701264_05"
+    destination = "/tmp/bhaktidesai_002701264_05"
   }
   provisioner "shell" {
     environment_vars = [
