@@ -29,8 +29,8 @@ sudo apt-get install -y mariadb-server
 sudo apt-get install -y unzip
 
 # Start and enable MariaDB service
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
+# sudo systemctl start mariadb
+# sudo systemctl enable mariadb
 
 # Set the root password for MariaDB
 # sudo mysqladmin -u root password "$ROOT_PASSWORD"
@@ -54,7 +54,7 @@ sudo npm install
 # sudo mv /opt/webapp/autosys.service /etc/systemd/system/
  
 # Enable and start the systemd service
-# sudo systemctl enable autosys
-# sudo systemctl start autosys
+sudo systemctl enable autosys
+sudo systemctl start autosys
 
 sudo apt-get clean
