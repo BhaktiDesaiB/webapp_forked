@@ -45,7 +45,7 @@ cd /opt/csye6225/webapp/
 
 sudo npm install
 
-sudo chown -R csye6225:csye6225
+sudo chown -R csye6225:csye6225 .
 sudo chmod -R 755 .
 
 # Move systemd service unit file to the correct location
