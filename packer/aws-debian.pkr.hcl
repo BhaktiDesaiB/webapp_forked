@@ -85,7 +85,5 @@ build {
       "CHECKPOINT_DISABLE=1"
     ]
     script = "./setup.sh"
-    expect_disconnect = true
-    valid_exit_codes  = [0, 2300218]
   }
 }
