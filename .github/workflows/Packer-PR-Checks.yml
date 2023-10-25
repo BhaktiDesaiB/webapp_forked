@@ -22,7 +22,7 @@ jobs:
       - name: Run Packer init
         run: packer init ./packer/aws-debian.pkr.hcl
       - name: Run packer fmt
-        run: packer fmt -check ./packer/aws-debian.pkr.hcl
+        run: packer fmt ./packer/aws-debian.pkr.hcl
       - name: Check for changes
         id: git-diff
         run: |
