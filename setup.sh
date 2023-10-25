@@ -23,7 +23,7 @@ sudo apt-get upgrade -y
 sudo apt-get install -y nodejs npm
 
 # Install MariaDB
-sudo apt-get install -y mariadb-server
+# sudo apt-get install -y mariadb-server
 
 # Install unzip
 sudo apt-get install -y unzip
