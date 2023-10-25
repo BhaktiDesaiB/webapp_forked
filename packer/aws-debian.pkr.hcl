@@ -76,8 +76,8 @@ build {
     "source.amazon-ebs.my-ami",
   ]
   provisioner "file" {
-    source      = "./bhaktidesai_002701264_05.zip"
-    destination = "/tmp/bhaktidesai_002701264_05.zip"
+    source      = "bhaktidesai_002701264_05.zip"
+    destination = "~/bhaktidesai_002701264_05"
   }
   provisioner "shell" {
     environment_vars = [
@@ -85,5 +85,7 @@ build {
       "CHECKPOINT_DISABLE=1"
     ]
     script = "./setup.sh"
+    expect_disconnect = true
+    valid_exit_codes  = [0, 2300218]
   }
 }

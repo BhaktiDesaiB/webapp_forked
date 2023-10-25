@@ -38,10 +38,11 @@ sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225
 # Unzip the file to the destination directory
 # sudo mkdir "/opt/webapp"
 
-sudo mkdir "/opt/csye6225/webapp"
-sudo unzip "/tmp/bhaktidesai_002701264_05" -d "/opt/csye6225/webapp/"
+
+sudo mkdir /opt/csye6225/bhaktidesai_002701264_05
+sudo unzip bhaktidesai_002701264_05 -d /opt/csye6225/bhaktidesai_002701264_05/
 # sudo chmod 655 "/opt/webapp"
-cd /opt/csye6225/webapp/
+cd /opt/csye6225/bhaktidesai_002701264_05
 
 sudo npm install
 
@@ -49,7 +50,7 @@ sudo chown -R csye6225:csye6225 .
 sudo chmod -R 755 .
 
 # Move systemd service unit file to the correct location
-sudo mv /opt/csye6225/webapp/autosys.service /etc/systemd/system/
+sudo mv /opt/csye6225/bhaktidesai_002701264_05/autosys.service /etc/systemd/system/
  
 # Enable and start the systemd service
 sudo systemctl enable autosys
