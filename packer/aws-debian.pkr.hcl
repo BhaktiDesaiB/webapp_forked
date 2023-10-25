@@ -44,7 +44,6 @@ variable "instance_type" {
 }
 
 source "amazon-ebs" "my-ami" {
-  ami_name        = "${var.ami_name}"
   ami_description = "${var.ami_description}"
   region          = "${var.aws_region}"
   ami_users       = [310794324007, 607251300885]
