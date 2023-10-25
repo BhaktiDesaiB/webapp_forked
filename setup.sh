@@ -28,25 +28,11 @@ sudo apt-get install -y nodejs npm
 # Install unzip
 sudo apt-get install -y unzip
 
-# Start and enable MariaDB service
-# sudo systemctl start mariadb
-# sudo systemctl enable mariadb
-
-# Set the root password for MariaDB
-# sudo mysqladmin -u root password "$ROOT_PASSWORD"
-# Create the "Cloud_db" database
-# sudo mysql -u root -p"$ROOT_PASSWORD" -e "CREATE DATABASE $DB_NAME;"
-
-# Create a new MariaDB user with administrative privileges
-# sudo mysql -u root -p"$ROOT_PASSWORD" -e "CREATE USER '$NEW_USER'@'localhost' IDENTIFIED BY '$NEW_USER_PASSWORD';"
-# sudo mysql -u root -p"$ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON *.* TO '$NEW_USER'@'localhost' WITH GRANT OPTION;"
-# sudo mysql -u root -p"$ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
-
 # Unzip the file to the destination directory
-sudo mkdir "/opt/webapp"
-sudo unzip "/tmp/bhaktidesai_002701264_05.zip" -d "/opt/webapp"
+# sudo mkdir "/opt/webapp"
+sudo unzip "/tmp/bhaktidesai_002701264_05.zip" -d "/opt/webapp/"
 sudo chmod 655 "/opt/webapp"
-cd /opt/webapp
+cd /opt/webapp/
 
 sudo npm install
 
