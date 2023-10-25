@@ -1,4 +1,4 @@
-name: Build AMI with Packer
+name: Build-AMI-with-Packer
 on:
   push:
     branches:
@@ -10,15 +10,15 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Create .env File
-        run: |
-          echo "PORT=3000" >> .env
-          echo "DB_HOST=127.0.0.1" >> .env
-          echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=cloud_assignment" >> .env
-          echo "DB_USER=admin" >> .env
-          echo "DB_PASSWORD=admin@123" >> .env
-        working-directory: ${{ github.workspace }}
+      # - name: Create .env File
+      #   run: |
+      #     echo "PORT=3000" >> .env
+      #     echo "DB_HOST=127.0.0.1" >> .env
+      #     echo "DB_PORT=3306" >> .env
+      #     echo "DB_DATABASE=cloud_assignment" >> .env
+      #     echo "DB_USER=admin" >> .env
+      #     echo "DB_PASSWORD=admin@123" >> .env
+      #   working-directory: ${{ github.workspace }}
       - name: Create Zip Archive
         run: |
           zip -r bhaktidesai_002701264_05.zip ./
@@ -26,7 +26,7 @@ jobs:
       - name: Build AMI
         run: |
           packer init ./packer/aws-debian.pkr.hcl
-          packer fmt ./packer/aws-debian.pkr.hcl
+          packer fmt -check ./packer/aws-debian.pkr.hcl
           packer validate ./packer/aws-debian.pkr.hcl
           packer build ./packer/aws-debian.pkr.hcl
         env:

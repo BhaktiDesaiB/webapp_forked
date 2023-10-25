@@ -32,7 +32,7 @@ app.get('/healthz', async (req, res) => {
   });
 
 // Route to retrieve all assignments with Basic Authentication required
-app.get('/assignments', basicAuth, async (req, res) => {
+app.get('/v1/assignments', basicAuth, async (req, res) => {
   try {
     // Use Sequelize to query the "Assignment" table for all assignments
     const assignments = await Assignment.findAll();
@@ -47,7 +47,7 @@ app.get('/assignments', basicAuth, async (req, res) => {
 
 
 // Route to create a new assignment and concatenate user ID and assignment ID
-app.post('/assignments', basicAuth, async (req, res) => {
+app.post('/v1/assignments', basicAuth, async (req, res) => {
   try {
     // Extract the email from the authorization header (Basic Auth)
     const authHeader = req.headers.authorization || '';
@@ -100,7 +100,7 @@ app.post('/assignments', basicAuth, async (req, res) => {
 
 
 // Route to get assignment details by ID
-app.get('/assignments/:id',basicAuth, async (req, res) => {
+app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     const { id } = req.params;
@@ -121,8 +121,19 @@ app.get('/assignments/:id',basicAuth, async (req, res) => {
   }
 });
 
+// Route to get assignment details by ID
+app.patch('/v1/assignments/:id',basicAuth, async (req, res) => {
+  try {
+    // Return the assignment details as a JSON response
+    res.status(405).json(assignment);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Unable to retrieve assignment details' });
+  }
+});
+
 // Route to update an assignment by ID
-app.put('/assignments/:id', basicAuth, async (req, res) => {
+app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     const { id } = req.params;
@@ -181,7 +192,7 @@ app.put('/assignments/:id', basicAuth, async (req, res) => {
 });
 
 // Route to delete an assignment by ID
-app.delete('/assignments/:id', basicAuth, async (req, res) => {
+app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     const { id } = req.params;
