@@ -11,10 +11,10 @@ NEW_USER="admin"
 NEW_USER_PASSWORD="admin@123"
 
 # Specify the path to the zip file
-ZIP_FILE="/tmp/bhaktidesai_002701264_05.zip"
+# ZIP_FILE="/tmp/bhaktidesai_002701264_05.zip"
 
 # Specify the destination directory for extraction
-DEST_DIR="/opt/"
+# DEST_DIR="/opt/"
 
 # Update the package list to get the latest package information
 sudo apt-get update
@@ -46,9 +46,10 @@ sudo mysql -u root -p"$ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON *.* TO '$NEW_U
 sudo mysql -u root -p"$ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
 
 # Unzip the file to the destination directory
-sudo unzip "$ZIP_FILE" -d "$DEST_DIR"
-sudo chmod 655 "/opt"
-cd /opt/
+sudo mkdir "/opt/webapp"
+sudo unzip "/tmp/bhaktidesai_002701264_05.zip" -d "/opt/webapp"
+sudo chmod 655 "/opt/webapp"
+cd /opt/webapp
 
 sudo npm install
 sudo apt-get clean
