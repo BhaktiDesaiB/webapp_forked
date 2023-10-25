@@ -44,9 +44,11 @@ variable "instance_type" {
 }
 
 source "amazon-ebs" "my-ami" {
+  ami_name        = "db_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "${var.ami_description}"
   region          = "${var.aws_region}"
-  ami_users       = [310794324007, 607251300885]
+
+  ami_users = [310794324007, 607251300885]
   ami_regions = [
     "us-east-1",
   ]
