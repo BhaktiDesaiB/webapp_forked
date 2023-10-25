@@ -25,10 +25,10 @@ jobs:
         working-directory: ${{ github.workspace }}
       - name: Build AMI
         run: |
-          packer init ./packer/aws-Debian.pkr.hcl
-          packer fmt ./packer/aws-Debian.pkr.hcl
-          packer validate ./packer/aws-Debian.pkr.hcl
-          packer build ./packer/aws-Debian.pkr.hcl
+          packer init ./packer/aws-debian.pkr.hcl
+          packer fmt ./packer/aws-debian.pkr.hcl
+          packer validate ./packer/aws-debian.pkr.hcl
+          packer build ./packer/aws-debian.pkr.hcl
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
