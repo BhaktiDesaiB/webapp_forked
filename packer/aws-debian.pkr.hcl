@@ -76,8 +76,8 @@ build {
     "source.amazon-ebs.my-ami",
   ]
   provisioner "file" {
-    source      = "bhaktidesai_002701264_05.zip"
-    destination = "/tmp/bhaktidesai_002701264_05"
+    source      = "./bhaktidesai_002701264_05.zip"
+    destination = "/tmp/bhaktidesai_002701264_05.zip"
   }
   provisioner "shell" {
     environment_vars = [
