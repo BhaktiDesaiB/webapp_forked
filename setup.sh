@@ -40,7 +40,9 @@ sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225
 
 
 sudo mkdir "/opt/csye6225/bhaktidesai_002701264_05"
-sudo unzip "bhaktidesai_002701264_05" -d "/opt/csye6225/bhaktidesai_002701264_05/"
+
+sudo unzip "/tmp/bhaktidesai_002701264_05" -d "/opt/csye6225/bhaktidesai_002701264_05/"
+
 # sudo chmod 655 "/opt/webapp"
 cd "/opt/csye6225/bhaktidesai_002701264_05"
 
