@@ -76,8 +76,6 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     // Concatenate user ID and assignment ID with an underscore ('_')
     const concatenatedId = `${user.id}_${newAssignment.id}`;
 
-  
-
     // Insert the concatenated ID into the "Assignment_links" table
     const assignmentLink = await Assignment_links.create({
       id: concatenatedId,
@@ -97,7 +95,6 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     res.status(400).json({ error: 'Unable to create assignment' });
   }
 });
-
 
 // Route to get assignment details by ID
 app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
@@ -244,11 +241,9 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
   }
 });
 
+const PORT = 3000;
 
-
-
-
-app.listen(process.env.PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server is running`);
   });
 

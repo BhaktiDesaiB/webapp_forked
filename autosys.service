@@ -3,7 +3,6 @@ Description=CSYE 6225 webapp service
 ConditionPathExists=/opt/csye6225/bhaktidesai_002701264_05
 After=cloud-init.target
 
-
 [Service]
 Type=simple
 User=csye6225
