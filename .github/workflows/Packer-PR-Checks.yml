@@ -44,4 +44,3 @@ jobs:
       - name: Final checks
         if: ${{ steps.validate-status.outcome == 'success' }}
         run: echo "All checks passed."
-

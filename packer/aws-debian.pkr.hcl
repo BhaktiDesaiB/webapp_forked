@@ -71,7 +71,7 @@ source "amazon-ebs" "debian" {
 }
 
 build {
-  sources = ["source.amazon-ebs.my-ami"]
+  sources = ["source.amazon-ebs.debian"]
   provisioner "file" {
     source      = "./bhaktidesai_002701264_05.zip"
     destination = "/tmp/bhaktidesai_002701264_05.zip"
