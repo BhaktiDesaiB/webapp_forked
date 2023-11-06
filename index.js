@@ -3,6 +3,7 @@ const sequelize = require('./database');
 const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
 const basicAuth = require('./Token');
+const logger = require('./logger');
 
 const dotenv = require('dotenv');
 
@@ -18,12 +19,13 @@ app.get('/healthz', async (req, res) => {
     try {
       // Attempt to authenticate with the database
       await sequelize.authenticate();
-  
+      logger.info('/healthz: This is an info message.');
+      logger.warn('/healthz: This is a warning message.');
+      logger.error('/healthz: This is an error message.');
       // Set response headers to disable caching
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
-  
       res.status(200).json();
     } catch (error) {
       console.error('error info', error);
@@ -36,7 +38,6 @@ app.get('/v1/assignments', basicAuth, async (req, res) => {
   try {
     // Use Sequelize to query the "Assignment" table for all assignments
     const assignments = await Assignment.findAll();
-
     // Send the retrieved assignments as a JSON response
     res.status(200).json(assignments);
   } catch (error) {
@@ -122,7 +123,18 @@ app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
 app.patch('/v1/assignments/:id',basicAuth, async (req, res) => {
   try {
     // Return the assignment details as a JSON response
-    res.status(405).json(assignment);
+    res.status(405).json();
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Unable to retrieve assignment details' });
+  }
+});
+
+// Route to get assignment details
+app.patch('/v1/assignments/',basicAuth, async (req, res) => {
+  try {
+    // Return the assignment details as a JSON response
+    res.status(405).json();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Unable to retrieve assignment details' });
