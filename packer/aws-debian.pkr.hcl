@@ -14,7 +14,7 @@ variable "aws_region" {
 
 variable "source_ami" {
   type    = string
-  default = "ami-06db4d78cb1d3bbf9" 
+  default = "ami-06db4d78cb1d3bbf9"
 }
 
 variable "ssh_username" {
@@ -48,7 +48,7 @@ source "amazon-ebs" "debian" {
   region          = "${var.aws_region}"
 
   ami_users = [310794324007, 607251300885]
-  ami_regions = [ "us-east-1",
+  ami_regions = ["us-east-1",
   ]
 
   aws_polling {
@@ -80,6 +80,6 @@ build {
       "DEBIAN_FRONTEND= noninteractive",
       "CHECKPOINT_DISABLE=1"
     ]
-    script = ["./setup.sh","./cloudsetup.sh"]
+    script = ["./setup.sh", "./cloudsetup.sh"]
   }
 }
