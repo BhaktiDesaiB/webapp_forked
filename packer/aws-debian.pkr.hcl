@@ -27,7 +27,6 @@ variable "subnet_id" {
   default = "subnet-0e9aaeaee7a506d3e"
 }
 
-
 variable "ami_description" {
   type    = string
   default = "ami for csye6225"
