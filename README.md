@@ -1,5 +1,4 @@
 # webapp
-Assignment 3
 
 Prerequisites:
 1. Node JS
