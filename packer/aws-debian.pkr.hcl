@@ -80,6 +80,13 @@ build {
       "DEBIAN_FRONTEND= noninteractive",
       "CHECKPOINT_DISABLE=1"
     ]
-    script = ["./setup.sh", "./cloudsetup.sh"]
+    script = "./setup.sh"
+  }
+  provisioner "shell" {
+    environment_vars = [
+      "DEBIAN_FRONTEND= noninteractive",
+      "CHECKPOINT_DISABLE=1"
+    ]
+    script = "./cloudsetup.sh"
   }
 }
