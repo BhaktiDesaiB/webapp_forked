@@ -43,7 +43,7 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-source "amazon-ebs" "my-ami" {
+source "amazon-ebs" "debian" {
   ami_name        = "db_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "${var.ami_description}"
   region          = "${var.aws_region}"

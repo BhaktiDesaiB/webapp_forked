@@ -1,25 +1,23 @@
 #!/bin/bash
 
-# Set the root password for MariaDB
-# ROOT_PASSWORD="root"
-# DB_NAME="cloud_assignment"
+# Install the CloudWatch Agent
+curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+sudo rpm -U ./amazon-cloudwatch-agent.rpm
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c ssm:AmazonCloudWatch-linux -s
 
-# New user information
-# NEW_USER="admin"
-# NEW_USER_PASSWORD="admin@123"
+# Clean up the downloaded RPM file
+rm -f amazon-cloudwatch-agent.rpm
 
-# Specify the path to the zip file
-# ZIP_FILE="/tmp/bhaktidesai_002701264_05.zip"
-
-# Specify the destination directory for extraction
-# DEST_DIR="/opt/"
+# Continue with your other commands
 sudo apt-get clean
 
 # Update the package list to get the latest package information
 sudo apt-get update
 
+# Remove Git 
 sudo apt remove git -y
 
+# Upgrade packages
 sudo apt-get upgrade -y
 
 # Install Node.js and npm
@@ -32,21 +30,22 @@ sudo apt-get install -y nodejs npm
 # Install unzip
 sudo apt-get install -y unzip
 
+# Create a group and user
 sudo groupadd csye6225
 sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225
 
-# Unzip the file to the destination directory
-# sudo mkdir "/opt/webapp"
-
-
+# Create a directory and unzip the application
 sudo mkdir "/opt/csye6225/bhaktidesai_002701264_05"
 sudo unzip "/tmp/bhaktidesai_002701264_05" -d "/opt/csye6225/bhaktidesai_002701264_05/"
 
 # sudo chmod 655 "/opt/webapp"
+# Change to the application directory
 cd "/opt/csye6225/bhaktidesai_002701264_05"
 
+# Install application dependencies
 sudo npm install
 
+# Set permissions
 sudo chown -R csye6225:csye6225 .
 sudo chmod -R 755 .
 
@@ -57,4 +56,5 @@ sudo mv "/opt/csye6225/bhaktidesai_002701264_05/autosys.service" "/etc/systemd/s
 sudo systemctl enable autosys
 sudo systemctl start autosys
 
+# Clean up
 sudo apt-get clean
