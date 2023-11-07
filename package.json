@@ -27,6 +27,7 @@
     "fast-csv": "^4.3.6",
     "fs": "^0.0.1-security",
     "jest": "^29.7.0",
+    "moment": "^2.29.4",
     "mysql2": "^3.6.2",
     "sequelize": "^6.33.0",
     "supertest": "^6.3.3",
