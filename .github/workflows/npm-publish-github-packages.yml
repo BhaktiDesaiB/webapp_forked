@@ -1,7 +1,11 @@
 name: integration-test
 on:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
 jobs:
   setup:
     runs-on: ubuntu-latest

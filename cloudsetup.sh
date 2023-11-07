@@ -25,7 +25,7 @@ cat <<EOL | sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agen
           }
         ]
       },
-      "log_stream_name": "cloudwatch_log_stream"
+      #"log_stream_name": "cloudwatch_log_stream"
     }
   },
   "metrics": {
