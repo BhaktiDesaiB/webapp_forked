@@ -1,14 +1,18 @@
 const winston = require('winston');
-const WinstonCloudWatch = require('winston-cloudwatch');
-const moment = require('moment');
-const currentDate = moment().format('YYYY-MM-DD');
+const moment = require('moment-timezone');
+
+// Define a custom timestamp format
+const customTimestamp = winston.format((info) => {
+  info.timestamp = moment().tz('America/New_York').format('YYYY-MM-DD HH:mm:ss');
+  return info;
+});
 
 // Define the log format
 const logFormat = winston.format.combine(
-  winston.format.timestamp(),
+  customTimestamp(),
   winston.format.simple()
 );
- 
+
 // Create a Winston logger with multiple transports for different log levels
 const logger = winston.createLogger({
   level: 'info', // Minimum log level to capture
@@ -18,11 +22,10 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: "var/log/csye6225.log",
       level: 'info',
-    }),
- 
-    // Log 'error' and 'warning' messages to a separate file
-    new winston.transports.File({
-      filename: "var/log/csye6225.log",
+    },
+    {
+      // Log 'error' and 'warning' messages to a separate file
+      filename: "var/log/csye6225-error.log",
       level: 'error',
     }),
  

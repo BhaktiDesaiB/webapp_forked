@@ -4,11 +4,9 @@ const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
 const basicAuth = require('./Token');
 const logger = require('./logger');
-
 const dotenv = require('dotenv');
 
 dotenv.config();
-
 
 const app = express();
 // Enable JSON request body parsing
@@ -92,7 +90,7 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
       };
 
     // Return the response payload in the JSON response
-    logger.info('/v1/assignments: new assignment created!');
+    logger.info('/v1/assignments: new assignment created!'),responsePayload;
     res.status(201).json(responsePayload);
   } catch (error) {
     console.error('Error:', error);
