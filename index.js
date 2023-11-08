@@ -3,9 +3,12 @@ const sequelize = require('./database');
 const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
 const basicAuth = require('./Token');
-const logger = require('./logger');
-const dotenv = require('dotenv');
+const logger = require('./logger/logger');
 
+const stats = require('node-statsd');
+const statsdClient = new stats();
+
+const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
@@ -18,14 +21,16 @@ app.get('/healthz', async (req, res) => {
       // Attempt to authenticate with the database
       await sequelize.authenticate();
       logger.info('/healthz: status check ok!');
+      //statsd count for healthz hits
+      statsdClient.increment('healthz.get',1);
       // Set response headers to disable caching
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
       res.status(200).json();
     } catch (error) {
-      console.error('error info', error);
-      logger.error('/healthz: status check fail!');
+      console.error('error info : ', error);
+      logger.error('/healthz: status check fail!',error);
       res.status(503).send();
     }
   });
@@ -37,10 +42,12 @@ app.get('/v1/assignments', basicAuth, async (req, res) => {
     const assignments = await Assignment.findAll();
     // Send the retrieved assignments as a JSON response
     logger.warn('/v1/assignments: displaying all the assignmemts!');
+    //statsd count for assignment-get-all hits
+    statsdClient.increment('assignment.get',1);
     res.status(200).json(assignments);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: unable to retrieve assignments!');
+    logger.error('/v1/assignments: unable to retrieve assignments!',error);
     res.status(500).json({ error: 'Unable to retrieve' }); 
   }
 });
@@ -59,7 +66,7 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      logger.error('/v1/assignments: unable to find user!');
+      logger.error('/v1/assignments: unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -90,11 +97,13 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
       };
 
     // Return the response payload in the JSON response
-    logger.info('/v1/assignments: new assignment created!'),responsePayload;
+    logger.info('/v1/assignments: new assignment created!',responsePayload);
+    //statsd count for assignment-add hits
+    statsdClient.increment('assignment-add',1);
     res.status(201).json(responsePayload);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: assignment cannot be created!');
+    logger.error('/v1/assignments: assignment cannot be created!',error);
     res.status(400).json({ error: 'Unable to create assignment' });
   }
 });
@@ -114,40 +123,30 @@ app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
     // Return the assignment details as a JSON response
-    logger.info('/v1/assignments: displaying the assignmemt with specified id!');
+    logger.info('/v1/assignments: displaying the assignmemt with specified id!',assignment);
+    //statsd count for assignment-get hits
+    statsdClient.increment('assignment.get',1);
     res.status(200).json(assignment);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: unable to retrieve assignments!');
+    logger.error('/v1/assignments: unable to retrieve assignments!',error);
     res.status(500).json({ error: 'Unable to retrieve assignment details' });
   }
 });
 
 // Route to get assignment details by ID
-app.patch('/v1/assignments/:id',basicAuth, async (req, res) => {
+app.patch('/',basicAuth, async (req, res) => {
   try {
     // Return the assignment details as a JSON response
-    logger.error('/v1/assignments: Unable to access!');
-    res.status(405).json({ error: 'Unable to access' });
+    logger.error('/v1/assignments: method not allowed!',error);
+    res.status(405).json({ error: 'method not allowed' });
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to retrieve assignment details!');
-    res.status(500).json({ error: 'Unable to retrieve assignment details' });
+    logger.error('/v1/assignments: Unable to retrieve assignment details!',error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Route to get assignment details
-app.patch('/v1/assignments/',basicAuth, async (req, res) => {
-  try {
-    // Return the assignment details as a JSON response
-    logger.error('/v1/assignments: Unable to access!');
-    res.status(405).json();
-  } catch (error) {
-    console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to retrieve assignment details!');
-    res.status(500).json({ error: 'Unable to retrieve assignment details' });
-  }
-});
 
 // Route to update an assignment by ID
 app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
@@ -166,7 +165,7 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!user) {
       // Handle the case where the user with the provided email does not exist
-      logger.error('/v1/assignments: Unable to find user!');
+      logger.error('/v1/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -188,7 +187,7 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignmentLink) {
       // Handle the case where the user is not authorized to update the assignment
-      logger.error('/v1/assignments: not authorized to update!');
+      logger.error('/v1/assignments: not authorized to update!',error);
       return res.status(403).json({ error: 'You are not authorized to update this assignment' });
     }
 
@@ -204,11 +203,13 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
     });
 
     // Return the updated assignment as a JSON response
-    logger.info('/v1/assignments: updated successfully!');
+    logger.info('/v1/assignments: updated successfully!',assignment);
+    //statsd count for assignment-put hits
+    statsdClient.increment('assignment.put',1);
     res.status(200).json(assignment);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to update assignment!');
+    logger.error('/v1/assignments: Unable to update assignment!',error);
     res.status(500).json({ error: 'Unable to update assignment' });
   }
 });
@@ -230,7 +231,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!user) {
       // Handle the case where the user with the provided email does not exist
-      logger.error('/v1/assignments: Unable to find user!');
+      logger.error('/v1/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -251,7 +252,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignmentLink) {
       // Handle the case where the user is not authorized to delete the assignment
-      logger.error('/v1/assignments: not authorized to delete!');
+      logger.error('/v1/assignments: not authorized to delete!',error);
       return res.status(403).json({ error: 'You are not authorized to delete this assignment' });
     }
 
@@ -262,11 +263,13 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
     await assignmentLink.destroy();
 
     // Return a success message as a JSON response
+    //statsd count for assignment-delete hits
+    statsdClient.increment('assignment.delete',1);
     logger.info('/v1/assignments: assignment deleted successfully!');
     res.status(200).json({ message: 'Assignment and Assignment_links record deleted successfully' });
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to update assignment!');
+    logger.error('/v1/assignments: Unable to update assignment!',error);
     res.status(500).json({ error: 'Unable to delete assignment' });
   }
 });

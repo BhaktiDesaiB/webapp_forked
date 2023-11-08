@@ -33,7 +33,7 @@ cat <<EOL | sudo tee /opt/csye6225/bhaktidesai_002701264_05/amazon-cloudwatch-ag
       "statsd": {
         "service_address": ":8125",
         "metrics_collection_interval": 15,
-        "metrics_aggregation_interval": 300
+        "metrics_aggregation_interval": 60
       }
     }
   }
