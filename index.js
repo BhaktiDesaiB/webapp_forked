@@ -15,25 +15,67 @@ const app = express();
 // Enable JSON request body parsing
 app.use(express.json());
 
+//handling all the other http requests
+app.use('/healthz', (req , res , next) => {
+  if(req.method !== 'GET')
+  {
+      res.setHeader('Cache-Control','no-cache , no-store , must-revalidate');
+      res.setHeader('Pragma','no-cache');
+      logger.error('method not allowed',error);
+      res.status(405).json(); //irrespective of db on or off
+  }
+  else
+  {
+      next(); //if wrong api call
+  }  
+});
+
+//handling patch the other http requests
+app.use('/', (req , res , next) => {
+  if(req.method === 'PATCH')
+  {
+      res.setHeader('Cache-Control','no-cache , no-store , must-revalidate');
+      res.setHeader('Pragma','no-cache');
+      logger.error('method not allowed',error);
+      res.status(405).json(); //irrespective of db on or off
+  }
+  else
+  {
+      next(); //if wrong api call
+  }  
+});
+
 // Health check route to test database connectivity
 app.get('/healthz', async (req, res) => {
+  const expectedKeys = ['key1', 'key2']; // expected keys
+  const unexpectedKeys = Object.keys(req.query).filter(
+    (key) => !expectedKeys.includes(key)
+  );
+  if (unexpectedKeys.length > 0) {
+    // If there are unexpected query parameters, return a 404 error
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    logger.warn('/healthz: status check fail!');
+    res.status(404).json();
+  } else {
     try {
-      // Attempt to authenticate with the database
-      await sequelize.authenticate();
-      logger.info('/healthz: status check ok!');
-      //statsd count for healthz hits
-      statsdClient.increment('healthz.get',1);
-      // Set response headers to disable caching
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.status(200).json();
-    } catch (error) {
-      console.error('error info : ', error);
-      logger.error('/healthz: status check fail!',error);
-      res.status(503).send();
-    }
-  });
+    // Attempt to authenticate with the database
+    await sequelize.authenticate();
+    logger.info('/healthz: status check ok!');
+    //statsd count for healthz hits
+    statsdClient.increment('healthz.get',1);
+    // Set response headers to disable caching
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.status(200).json();
+  } catch (error) {
+    console.error('error info : ', error);
+    logger.error('/healthz: status check fail!',error);
+    res.status(503).send();
+  }
+}
+});
 
 // Route to retrieve all assignments with Basic Authentication required
 app.get('/v1/assignments', basicAuth, async (req, res) => {
@@ -52,6 +94,31 @@ app.get('/v1/assignments', basicAuth, async (req, res) => {
   }
 });
 
+// Route to get assignment details by ID
+app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
+  try {
+    // Extract the assignment ID from the route parameter
+    const { id } = req.params;
+
+    // Use Sequelize to find the assignment by its ID
+    const assignment = await Assignment.findOne({ where: { id } });
+
+    if (!assignment) {
+      // Handle the case where the assignment with the provided ID does not exist
+      logger.warn('/v1/assignments: assignment id not found!');
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+    // Return the assignment details as a JSON response
+    logger.info('/v1/assignments: displaying the assignmemt with specified id!',assignment);
+    //statsd count for assignment-get hits
+    statsdClient.increment('assignment.get',1);
+    res.status(200).json(assignment);
+  } catch (error) {
+    console.error('Error:', error);
+    logger.error('/v1/assignments: unable to retrieve assignments!',error);
+    res.status(500).json({ error: 'Unable to retrieve assignment details' });
+  }
+});
 
 // Route to create a new assignment and concatenate user ID and assignment ID
 app.post('/v1/assignments', basicAuth, async (req, res) => {
@@ -107,46 +174,6 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     res.status(400).json({ error: 'Unable to create assignment' });
   }
 });
-
-// Route to get assignment details by ID
-app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
-  try {
-    // Extract the assignment ID from the route parameter
-    const { id } = req.params;
-
-    // Use Sequelize to find the assignment by its ID
-    const assignment = await Assignment.findOne({ where: { id } });
-
-    if (!assignment) {
-      // Handle the case where the assignment with the provided ID does not exist
-      logger.warn('/v1/assignments: assignment id not found!');
-      return res.status(404).json({ error: 'Assignment not found' });
-    }
-    // Return the assignment details as a JSON response
-    logger.info('/v1/assignments: displaying the assignmemt with specified id!',assignment);
-    //statsd count for assignment-get hits
-    statsdClient.increment('assignment.get',1);
-    res.status(200).json(assignment);
-  } catch (error) {
-    console.error('Error:', error);
-    logger.error('/v1/assignments: unable to retrieve assignments!',error);
-    res.status(500).json({ error: 'Unable to retrieve assignment details' });
-  }
-});
-
-// Route to get assignment details by ID
-app.patch('/',basicAuth, async (req, res) => {
-  try {
-    // Return the assignment details as a JSON response
-    logger.error('/v1/assignments: method not allowed!',error);
-    res.status(405).json({ error: 'method not allowed' });
-  } catch (error) {
-    console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to retrieve assignment details!',error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 
 // Route to update an assignment by ID
 app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
