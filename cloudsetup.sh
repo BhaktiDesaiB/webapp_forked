@@ -24,9 +24,9 @@ cat <<EOL | sudo tee /opt/csye6225/bhaktidesai_002701264_05/amazon-cloudwatch-ag
             "log_stream_name": "webapp"
           }
         ]
-      },
-      "log_stream_name": "cloudwatch_log_stream"
-    }
+      }
+    },
+    "log_stream_name": "cloudwatch_log_stream"
   },
   "metrics": {
     "metrics_collected": {
@@ -39,4 +39,5 @@ cat <<EOL | sudo tee /opt/csye6225/bhaktidesai_002701264_05/amazon-cloudwatch-ag
   }
 }
 EOL
+
 sudo chown csye6225:csye6225 /opt/csye6225/bhaktidesai_002701264_05/amazon-cloudwatch-agent.json
