@@ -1,6 +1,7 @@
 const winston = require('winston');
 const WinstonCloudWatch = require('winston-cloudwatch');
 const moment = require('moment');
+const awsProfile = pulumi.getStackConfig().require("aws:profile");
 
 const currentDate = moment().format('YYYY-MM-DD');
 
@@ -35,16 +36,6 @@ const logger = winston.createLogger({
       ),
       level: 'warn',
     }),
-
-    // // Add CloudWatch transport
-    // new WinstonCloudWatch({
-    //     logGroupName: 'csye6225', //CloudWatch Log Group name
-    //     logStreamName: `webapp-${currentDate}`, // Use a dynamic log stream name based on date
-    //     awsAccessKeyId: 'YourAccessKeyId', // Replace with your AWS Access Key ID
-    //     awsSecretKey: 'YourSecretKey', // Replace with your AWS Secret Key
-    //     awsRegion: 'us-east-1', // Replace with your AWS region
-    //     level: 'info', // Log level for CloudWatch
-    //   }),
   ],
 });
  
