@@ -1,4 +1,4 @@
-# webapp
+# webapp for assignments
 
 Prerequisites:
 1. Node JS
