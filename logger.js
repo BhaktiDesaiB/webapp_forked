@@ -1,8 +1,6 @@
 const winston = require('winston');
 const WinstonCloudWatch = require('winston-cloudwatch');
 const moment = require('moment');
-const awsProfile = pulumi.getStackConfig().require("aws:profile");
-
 const currentDate = moment().format('YYYY-MM-DD');
 
 // Define the log format
