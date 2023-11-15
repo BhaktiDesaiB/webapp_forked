@@ -140,10 +140,11 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     }
 
      // Check if the password matches
-     if (user.email !== email || user.password !== password){
-      logger.error('/v1/assignments: incorrect credentials!', error);
-      return res.status(401).json({ error: 'Incorrect credentials' });
-    }
+    //  if (user.password !== password){
+    //   logger.error('/v1/assignments: incorrect credentials!', error);
+    //   return res.status(401).json({ error: 'Incorrect credentials' });
+    // }
+
 
     // Extract assignment data from the request body
     const { name, points, num_of_attempts, deadline } = req.body;
@@ -204,11 +205,13 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check if the password matches
-    if (user.email !== email || user.password !== password) {
-      logger.error('/v1/assignments: incorrect credentials!', error);
-      return res.status(401).json({ error: 'Incorrect credentials' });
-    }
+
+    // // Check if the password matches
+    // if (user.email !== email || user.password !== password) {
+    //   logger.error('/v1/assignments: incorrect credentials!', error);
+    //   return res.status(401).json({ error: 'Incorrect credentials' });
+    // }
+
 
     // Use Sequelize to find the assignment by its ID
     const assignment = await Assignment.findOne({ where: { id } });
@@ -276,11 +279,13 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check if the password matches
-    if (user.email !== email || user.password !== password) {
-      logger.error('/v1/assignments: incorrect credentials!', error);
-      return res.status(401).json({ error: 'Incorrect credentials' });
-    }
+
+    // // Check if the password matches
+    // if (user.email !== email || user.password !== password) {
+    //   logger.error('/v1/assignments: incorrect credentials!', error);
+    //   return res.status(401).json({ error: 'Incorrect credentials' });
+    // }
+
 
     // Use Sequelize to find the assignment by its ID
     const assignment = await Assignment.findOne({ where: { id } });
