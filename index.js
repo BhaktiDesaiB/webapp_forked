@@ -63,7 +63,7 @@ app.get('/healthz', async (req, res) => {
     await sequelize.authenticate();
     logger.info('/healthz: status check ok!');
     //statsd count for healthz hits
-    statsdClient.increment('healthz.get',1);
+    statsdClient.increment('healthz.get.success',1);
     // Set response headers to disable caching
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -72,6 +72,8 @@ app.get('/healthz', async (req, res) => {
   } catch (error) {
     console.error('error info : ', error);
     logger.error('/healthz: status check fail!',error);
+    //statsd count for healthz hits
+    statsdClient.increment('healthz.get.fail',1);
     res.status(503).send();
   }
 }
@@ -137,6 +139,12 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+     // Check if the password matches
+     if (user.email !== email || user.password !== password){
+      logger.error('/v1/assignments: incorrect credentials!', error);
+      return res.status(401).json({ error: 'Incorrect credentials' });
+    }
+
     // Extract assignment data from the request body
     const { name, points, num_of_attempts, deadline } = req.body;
 
@@ -194,6 +202,12 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
       // Handle the case where the user with the provided email does not exist
       logger.error('/v1/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the password matches
+    if (user.email !== email || user.password !== password) {
+      logger.error('/v1/assignments: incorrect credentials!', error);
+      return res.status(401).json({ error: 'Incorrect credentials' });
     }
 
     // Use Sequelize to find the assignment by its ID
@@ -260,6 +274,12 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       // Handle the case where the user with the provided email does not exist
       logger.error('/v1/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the password matches
+    if (user.email !== email || user.password !== password) {
+      logger.error('/v1/assignments: incorrect credentials!', error);
+      return res.status(401).json({ error: 'Incorrect credentials' });
     }
 
     // Use Sequelize to find the assignment by its ID
