@@ -2,6 +2,7 @@ const express = require('express');
 const sequelize = require('./database');
 const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
+const {Submission, SubmissionCountTable} = require('./models/Submission');
 const basicAuth = require('./Token');
 const logger = require('./logger/logger');
 
@@ -181,6 +182,75 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     console.error('Error:', error);
     logger.error('/v1/assignments: assignment cannot be created!',error);
     res.status(400).json({ error: 'Unable to create assignment' });
+  }
+});
+
+// POST endpoint for submitting assignments
+app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
+  try {
+    const { submission_url } = req.body;
+    const { id }  = req.params;
+    const authHeader = req.headers.authorization || '';
+    const base64Credentials = authHeader.split(' ')[1] || '';
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const [email, password] = credentials.split(':');
+    // Use Sequelize to find the user by email
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      // Handle the case where the user with the provided email does not exist
+      logger.error("User not found with email" + email, error);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Use Sequelize to find the assignment by its ID
+    const assignment = await Assignment.findOne({ where: { id } });
+    if (!assignment) {
+      // Handle the case where the assignment with the provided ID does not exist
+      logger.error("Assignment not found with id:"+id,error);
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+    // Check if the submission deadline has passed
+    const currentDate = new Date();
+    const deadline = new Date(assignment.deadline);
+     if (currentDate > deadline) {
+      return res.status(403).json({ error: 'Submission deadline has passed' });
+    }
+    // Check if the user has already exceeded the retries
+    const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
+    let userSubmissions = await SubmissionCountTable.count({
+      where: { email:{[Op.like]: `%${email}`, }, },
+    });
+    console.log(userSubmissions);
+    if (userSubmissions >= retriesConfig) {
+      return res.status(403).json({ error: 'Exceeded maximum number of attempts' });
+    }
+    // Create submission entry in the database
+    const newSubmission = await Submission.create({
+      assignment_id: assignment.id,
+      submission_url: submission_url,
+      // Other submission data from req.body
+    });
+    userSubmissions++;
+    const newSubmissionCount = await SubmissionCountTable.create({
+      email: email,
+    })
+    // Post URL to SNS topic along with user info
+    const snsMessage = {
+      userEmail: user.email,
+      submissionUrl: `https://yourdomain.com/submissions/${newSubmission.id}`
+      // Other relevant data
+    };
+    // Publish message to SNS topic
+    sns.publish(topicArn, JSON.stringify(snsMessage), (err, data) => {
+      if (err) {
+        console.error('Error publishing to SNS:', err);
+      } else {
+        console.log('Message published to SNS:', data);
+      }
+    });
+    res.status(201).json({ message: 'Submission successful' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(400).json({ error: 'Unable to process submission' });
   }
 });
 
