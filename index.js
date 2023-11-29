@@ -217,7 +217,7 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
     // Check if the user has already exceeded the retries
     const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
     let userSubmissions = await SubmissionCountTable.count({
-      where: { email:{[Op.like]: `%${email}`, }, },
+      // where: { email:{[Op.like]: `%${email}`, }, },
     });
     console.log(userSubmissions);
     if (userSubmissions >= retriesConfig) {
@@ -247,9 +247,11 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
         console.log('Message published to SNS:', data);
       }
     });
+    logger.info('created');
     res.status(201).json({ message: 'Submission successful' });
   } catch (error) {
     console.error('Error:', error);
+    logger.error('unable',error);
     res.status(400).json({ error: 'Unable to process submission' });
   }
 });
