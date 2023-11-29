@@ -6,6 +6,7 @@ const {Submission, SubmissionCountTable} = require('./models/Submission');
 const {Submission, SubmissionCountTable} = require('./models/Submission');
 const basicAuth = require('./Token');
 const logger = require('./logger/logger');
+const { Op } = require('sequelize');
 
 const stats = require('node-statsd');
 const statsdClient = new stats();
@@ -218,7 +219,7 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
     // Check if the user has already exceeded the retries
     const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
     let userSubmissions = await SubmissionCountTable.count({
-      // where: { email:{[Op.like]: `%${email}`, }, },
+      where: { email:{[Op.like]: `%${email}`, }, },
     });
     console.log(userSubmissions);
     if (userSubmissions >= retriesConfig) {
