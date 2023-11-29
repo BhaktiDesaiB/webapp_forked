@@ -3,6 +3,7 @@ const sequelize = require('./database');
 const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
 const {Submission, SubmissionCountTable} = require('./models/Submission');
+const {Submission, SubmissionCountTable} = require('./models/Submission');
 const basicAuth = require('./Token');
 const logger = require('./logger/logger');
 
