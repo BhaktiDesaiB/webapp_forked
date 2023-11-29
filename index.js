@@ -14,6 +14,20 @@ const statsdClient = new stats();
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { Op } = require('sequelize');
+
+const AWS = require('aws-sdk');
+const profileName = 'dev';
+// Create a credentials object using the specified profile
+const credentials = new AWS.SharedIniFileCredentials({ profile: profileName });
+// Set the AWS credentials in the AWS SDK configuration
+AWS.config.credentials = credentials;
+
+// Initialize other AWS configurations as needed
+AWS.config.update({ region: 'us-east-1' });
+const sns = new AWS.SNS();
+const topicArn = 'arn:aws:sns:us-east-1:607251300885:DownloadRepo';
+
 const app = express();
 // Enable JSON request body parsing
 app.use(express.json());
@@ -238,7 +252,8 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
     // Post URL to SNS topic along with user info
     const snsMessage = {
       userEmail: user.email,
-      submissionUrl: `https://yourdomain.com/submissions/${newSubmission.id}`
+      // submissionUrl: `https://dbwebapp.me/submissions/${newSubmission.id}`
+      submission_url: req.body
       // Other relevant data
     };
     // Publish message to SNS topic
@@ -278,14 +293,6 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
       logger.error('/v1/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
-
-
-    // // Check if the password matches
-    // if (user.email !== email || user.password !== password) {
-    //   logger.error('/v1/assignments: incorrect credentials!', error);
-    //   return res.status(401).json({ error: 'Incorrect credentials' });
-    // }
-
 
     // Use Sequelize to find the assignment by its ID
     const assignment = await Assignment.findOne({ where: { id } });
@@ -353,14 +360,6 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-
-    // // Check if the password matches
-    // if (user.email !== email || user.password !== password) {
-    //   logger.error('/v1/assignments: incorrect credentials!', error);
-    //   return res.status(401).json({ error: 'Incorrect credentials' });
-    // }
-
-
     // Use Sequelize to find the assignment by its ID
     const assignment = await Assignment.findOne({ where: { id } });
 
@@ -370,6 +369,15 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
+    // const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
+    // let userSubmissions = await SubmissionCountTable.count({
+    //   where: { email:{[Op.like]: `%${email}`, }, },
+    // });
+    // console.log(userSubmissions);
+    // if (userSubmissions <= retriesConfig) {
+    //   return res.status(403).json({ error: 'cant be deleted' });
+    // }
+    
     // Concatenate user ID and assignment ID with an underscore ('_')
     const concatenatedId = `${user.id}_${assignment.id}`;
 
@@ -387,6 +395,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     // Delete the corresponding record in the Assignment_links table
     await assignmentLink.destroy();
+    
 
     // Return a success message as a JSON response
     //statsd count for assignment-delete hits

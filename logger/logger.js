@@ -23,11 +23,19 @@ const logger = winston.createLogger({
       filename: "var/log/csye6225.log",
       level: 'info',
     },
-    {
-      // Log 'error' and 'warning' messages to a separate file
-      filename: "var/log/csye6225-error.log",
+    // Log 'warning' and above messages to the console
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
       level: 'error',
     }),
+    // {
+    //   // Log 'error' and 'warning' messages to a separate file
+    //   filename: "var/log/csye6225.log",
+    //   level: 'error',
+    // }),
  
     // Log 'warning' and above messages to the console
     new winston.transports.Console({
@@ -37,6 +45,7 @@ const logger = winston.createLogger({
       ),
       level: 'warn',
     }),
+    ),
   ],
 });
  
