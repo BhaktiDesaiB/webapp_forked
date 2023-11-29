@@ -16,15 +16,20 @@ const { Op } = require('sequelize');
 
 const AWS = require('aws-sdk');
 const profileName = 'dev';
+
 // Create a credentials object using the specified profile
 const credentials = new AWS.SharedIniFileCredentials({ profile: profileName });
+
 // Set the AWS credentials in the AWS SDK configuration
 AWS.config.credentials = credentials;
 
 // Initialize other AWS configurations as needed
 AWS.config.update({ region: 'us-east-1' });
+
 const sns = new AWS.SNS();
 const topicArn = 'arn:aws:sns:us-east-1:607251300885:DownloadRepo';
+
+dotenv.config();
 
 const app = express();
 // Enable JSON request body parsing
@@ -204,17 +209,21 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
   try {
     const { submission_url } = req.body;
     const { id }  = req.params;
+
     const authHeader = req.headers.authorization || '';
     const base64Credentials = authHeader.split(' ')[1] || '';
     const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
     const [email, password] = credentials.split(':');
+
     // Use Sequelize to find the user by email
     const user = await User.findOne({ where: { email } });
+
     if (!user) {
       // Handle the case where the user with the provided email does not exist
       logger.error("User not found with email" + email, error);
       return res.status(404).json({ error: 'User not found' });
     }
+
     // Use Sequelize to find the assignment by its ID
     const assignment = await Assignment.findOne({ where: { id } });
     if (!assignment) {
@@ -222,46 +231,59 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
       logger.error("Assignment not found with id:"+id,error);
       return res.status(404).json({ error: 'Assignment not found' });
     }
+
     // Check if the submission deadline has passed
     const currentDate = new Date();
     const deadline = new Date(assignment.deadline);
+
      if (currentDate > deadline) {
       return res.status(403).json({ error: 'Submission deadline has passed' });
     }
+
     // Check if the user has already exceeded the retries
     const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
     let userSubmissions = await SubmissionCountTable.count({
-      where: { email:{[Op.like]: `%${email}`, }, },
+      where: { email, assignment_id: assignment.id },
     });
     console.log(userSubmissions);
+
     if (userSubmissions >= retriesConfig) {
       return res.status(403).json({ error: 'Exceeded maximum number of attempts' });
     }
+
     // Create submission entry in the database
     const newSubmission = await Submission.create({
       assignment_id: assignment.id,
       submission_url: submission_url,
-      // Other submission data from req.body
     });
     userSubmissions++;
     const newSubmissionCount = await SubmissionCountTable.create({
       email: email,
+      assignment_id: assignment.id,
     })
+
     // Post URL to SNS topic along with user info
-    const snsMessage = {
-      userEmail: user.email,
-      // submissionUrl: `https://dbwebapp.me/submissions/${newSubmission.id}`
-      submission_url: req.body
-      // Other relevant data
+    const message = {
+      gitRepoUrl: submission_url,
+      emailAddress: email,
     };
+
+    const messageParams = {
+      Message: JSON.stringify(message), // Customize the message content
+      TopicArn: 'arn:aws:sns:us-east-1:607251300885:DownloadRepo', // Replace with your SNS topic ARN
+    };
+    
     // Publish message to SNS topic
-    sns.publish(topicArn, JSON.stringify(snsMessage), (err, data) => {
-      if (err) {
-        console.error('Error publishing to SNS:', err);
+    sns.publish(messageParams, (snsErr, data) => {
+      if (snsErr) {
+        console.error('Error publishing SMS:', snsErr);
+        // Handle error if required
       } else {
-        console.log('Message published to SNS:', data);
+        console.log('SMS published successfully:', data.MessageId);
+        // Optionally, handle success response
       }
     });
+
     res.status(201).json({ message: 'Submission successful' });
   } catch (error) {
     console.error('Error:', error);
@@ -339,6 +361,9 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
+    if (Object.keys(req.body).length !== 0) {
+      return res.status(400).json({ error: 'DELETE request should not include a request body' });
+    }
     const { id } = req.params;
 
     // Extract the authenticated user's email from Basic Authentication
@@ -352,7 +377,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!user) {
       // Handle the case where the user with the provided email does not exist
-      logger.error('/v1/assignments: Unable to find user!',error);
+      logger.error('/v1/assignments: Unable to find user!' + email ,error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -365,15 +390,6 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
-    // const retriesConfig = assignment.num_of_attempts || 1; // Assuming a default of 1 attempt
-    // let userSubmissions = await SubmissionCountTable.count({
-    //   where: { email:{[Op.like]: `%${email}`, }, },
-    // });
-    // console.log(userSubmissions);
-    // if (userSubmissions <= retriesConfig) {
-    //   return res.status(403).json({ error: 'cant be deleted' });
-    // }
-    
     // Concatenate user ID and assignment ID with an underscore ('_')
     const concatenatedId = `${user.id}_${assignment.id}`;
 
@@ -386,27 +402,32 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
       return res.status(403).json({ error: 'You are not authorized to delete this assignment' });
     }
 
+    let userSubmissions = await SubmissionCountTable.count({
+      where: { assignment_id: assignment.id },
+    });
+    console.log(userSubmissions);
+
+    if (userSubmissions>0){
+      return res.status(403).json({error: 'Assignment cannot be deleted due to submissions against it'});
+    }
+
     // Delete the assignment from the database
     await assignment.destroy();
 
     // Delete the corresponding record in the Assignment_links table
     await assignmentLink.destroy();
-    
 
-    // Return a success message as a JSON response
-    //statsd count for assignment-delete hits
     statsdClient.increment('assignment.delete',1);
     logger.info('/v1/assignments: assignment deleted successfully!');
-    res.status(200).json({ message: 'Assignment and Assignment_links record deleted successfully' });
+    res.status(204).json({ message: 'Assignment and Assignment_links record deleted successfully' });
   } catch (error) {
     console.error('Error:', error);
     logger.error('/v1/assignments: Unable to update assignment!',error);
-    res.status(500).json({ error: 'Unable to delete assignment' });
+    res.status(404).json({ error: 'Unable to delete assignment' });
   }
 });
 
 const PORT = 3000;
-
 app.listen(PORT, () => {
     console.log(`Server is running`);
   });
