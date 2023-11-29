@@ -32,6 +32,8 @@
     "moment-timezone": "^0.5.43",
     "mysql2": "^3.6.2",
     "node-statsd": "^0.1.1",
+    "path": "^0.12.7",
+    "pm2": "^5.3.0",
     "sequelize": "^6.33.0",
     "supertest": "^6.3.3",
     "uuid": "^9.0.1",
