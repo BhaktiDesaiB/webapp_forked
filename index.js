@@ -3,8 +3,10 @@ const sequelize = require('./database');
 const User = require('./models/Users');
 const {Assignment, Assignment_links} = require('./models/Assignments');
 const {Submission, SubmissionCountTable} = require('./models/Submission');
+const {Submission, SubmissionCountTable} = require('./models/Submission');
 const basicAuth = require('./Token');
 const logger = require('./logger/logger');
+const { Op } = require('sequelize');
 
 const stats = require('node-statsd');
 const statsdClient = new stats();
@@ -247,9 +249,11 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
         console.log('Message published to SNS:', data);
       }
     });
+    logger.info('created');
     res.status(201).json({ message: 'Submission successful' });
   } catch (error) {
     console.error('Error:', error);
+    logger.error('unable',error);
     res.status(400).json({ error: 'Unable to process submission' });
   }
 });
