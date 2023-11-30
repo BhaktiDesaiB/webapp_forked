@@ -422,7 +422,8 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
     res.status(204).json({ message: 'Assignment and Assignment_links record deleted successfully' });
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to update assignment!',error);
+    
+    logger.error('/v1/assignments: Unable to delete assignment!',error);
     res.status(404).json({ error: 'Unable to delete assignment' });
   }
 });
