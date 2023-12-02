@@ -27,7 +27,6 @@ AWS.config.credentials = credentials;
 AWS.config.update({ region: 'us-east-1' });
 
 const sns = new AWS.SNS();
-const topicArn = 'arn:aws:sns:us-east-1:607251300885:DownloadRepo';
 
 dotenv.config();
 
@@ -207,7 +206,7 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
 // POST endpoint for submitting assignments
 app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
   try {
-    const { submission_url } = req.body;
+    const { submission_url } = req.body.submission_url;
     const { id }  = req.params;
 
     const authHeader = req.headers.authorization || '';
@@ -263,27 +262,41 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
     })
 
     // Post URL to SNS topic along with user info
-    const message = {
+    var message = {
       gitRepoUrl: submission_url,
+      assignment_id: assignment.name,
       emailAddress: email,
     };
 
     const messageParams = {
       Message: JSON.stringify(message), // Customize the message content
-      TopicArn: 'arn:aws:sns:us-east-1:607251300885:DownloadRepo', // Replace with your SNS topic ARN
+      TopicArn: process.env.TOPIC_ARN, // Replace with your SNS topic ARN
     };
     
-    // Publish message to SNS topic
-    sns.publish(messageParams, (snsErr, data) => {
-      if (snsErr) {
-        console.error('Error publishing SMS:', snsErr);
-        // Handle error if required
-      } else {
-        console.log('SMS published successfully:', data.MessageId);
-        // Optionally, handle success response
-      }
-    });
+    // // Publish message to SNS topic
+    // sns.publish(messageParams, (snsErr, data) => {
+    //   if (snsErr) {
+    //     console.error('Error publishing SMS:', snsErr);
+    //     // Handle error if required
+    //   } else {
+    //     console.log('SMS published successfully:', data.MessageId);
+    //     // Optionally, handle success response
+    //   }
+    // });
 
+    var publishTextPromise = new AWS.SNS({ apiVersion: "2010-03-31" })
+      .publish(messageParams)
+      .promise();
+      publishTextPromise
+        .then(function(data){
+          console.log(
+            `Message ${messageParams.Message} sent to the topic ${messageParams.TopicArn}`
+          );
+          console.log("MessageID is " + data.MessageId);
+        })
+        .catch(function (err) {
+          console.error(err, err.stack);
+        });
     res.status(201).json({ message: 'Submission successful' });
   } catch (error) {
     console.error('Error:', error);
