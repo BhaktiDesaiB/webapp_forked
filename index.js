@@ -206,7 +206,7 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
 // POST endpoint for submitting assignments
 app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
   try {
-    const { submission_url } = req.body;
+    const { submission_url } = req.body.submission_url;
     const { id }  = req.params;
 
     const authHeader = req.headers.authorization || '';
