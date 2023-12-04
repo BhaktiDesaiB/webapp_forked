@@ -27,6 +27,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
+      - name: Latest AMI fetch
+        run: |
+          aws ec2 describe-images --region us-east-1 --owners self --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text --profile dev
       - name: Configuring AWS Credentials for dev environment
         if: ${{ vars.ENVIRONMENT == 'dev' }}
         uses: aws-actions/configure-aws-credentials@v1
