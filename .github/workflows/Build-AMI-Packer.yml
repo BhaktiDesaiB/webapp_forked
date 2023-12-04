@@ -1,3 +1,4 @@
+---
 name: Build-AMI-with-Packer
 on:
   push:
@@ -6,24 +7,14 @@ on:
 jobs:
   create-zip:
     runs-on: ubuntu-latest
-    # if: github.event.pull_request.merged == true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      # - name: Create .env File
-      #   run: |
-      #     echo "PORT=3000" >> .env
-      #     echo "DB_HOST=127.0.0.1" >> .env
-      #     echo "DB_PORT=3306" >> .env
-      #     echo "DB_DATABASE=cloud_assignment" >> .env
-      #     echo "DB_USER=admin" >> .env
-      #     echo "DB_PASSWORD=admin@123" >> .env
-      #   working-directory: ${{ github.workspace }}
       - name: Create Zip Archive
         run: |
           zip -r bhaktidesai_002701264_05.zip ./
         working-directory: ${{ github.workspace }}
-      - name: Build AMI
+      - name: Build AMI with Packer
         run: |
           packer init ./packer/aws-debian.pkr.hcl
           packer fmt -check ./packer/aws-debian.pkr.hcl
@@ -32,3 +23,55 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Configuring AWS Credentials for dev environment
+        if: ${{ vars.ENVIRONMENT == 'dev' }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configuring AWS Credentials for demo environment
+        if: ${{ vars.ENVIRONMENT == 'demo' }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.DEMO_ACCESS }}
+          aws-secret-access-key: ${{ secrets.DEMO_SECRET }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: New Launch Template Version & ASG Refresh
+        run: >
+          # Check if launch template ID and auto scaling group name are available
+
+          if ! [[ $launch_template_id == null ]] && ! [[ $auto_scaling_name == null ]]
+
+          then
+            echo "Launch Template Found"
+            # Create a new version of launch template
+            aws ec2 create-launch-template-version \
+              --launch-template-id $(aws ec2 describe-launch-templates \
+                                    --query 'sort_by(LaunchTemplates, &CreateTime)[-1].LaunchTemplateId' \
+                                    --output text) \
+              --version-description Version2 \
+              --source-version 1 \
+              --launch-template-data "ImageId=$(aws ec2 describe-images \
+                                                --owners ${{ secrets.AWS_DEV}} \
+                                                --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
+                                                --output text)"
+            
+            # Start instance refresh for auto scaling group
+            aws autoscaling start-instance-refresh \
+              --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups \
+                                          --query "AutoScalingGroups[0].AutoScalingGroupName" \
+                                          --output text)
+
+            
+          else
+            echo "Launch Template Not Found"
+          fi
+
+
+          # Loop to check instance refresh status
+
+          while [[ "$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[0].AutoScalingGroupName" --output text) --query 'InstanceRefreshes[0].Status' --output text)" != "Successful" ]]; do
+            echo "Waiting for instance refresh to complete..."
+            sleep 30
+          done
