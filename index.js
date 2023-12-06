@@ -100,24 +100,24 @@ app.get('/healthz', async (req, res) => {
 });
 
 // Route to retrieve all assignments with Basic Authentication required
-app.get('/v1/assignments', basicAuth, async (req, res) => {
+app.get('/demo/assignments', basicAuth, async (req, res) => {
   try {
     // Use Sequelize to query the "Assignment" table for all assignments
     const assignments = await Assignment.findAll();
     // Send the retrieved assignments as a JSON response
-    logger.warn('/v1/assignments: displaying all the assignmemts!');
+    logger.warn('/demo/assignments: displaying all the assignmemts!');
     //statsd count for assignment-get-all hits
     statsdClient.increment('assignment.get',1);
     res.status(200).json(assignments);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: unable to retrieve assignments!',error);
+    logger.error('/demo/assignments: unable to retrieve assignments!',error);
     res.status(500).json({ error: 'Unable to retrieve' }); 
   }
 });
 
 // Route to get assignment details by ID
-app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
+app.get('/demo/assignments/:id',basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     const { id } = req.params;
@@ -127,23 +127,23 @@ app.get('/v1/assignments/:id',basicAuth, async (req, res) => {
 
     if (!assignment) {
       // Handle the case where the assignment with the provided ID does not exist
-      logger.warn('/v1/assignments: assignment id not found!');
+      logger.warn('/demo/assignments: assignment id not found!');
       return res.status(404).json({ error: 'Assignment not found' });
     }
     // Return the assignment details as a JSON response
-    logger.info('/v1/assignments: displaying the assignmemt with specified id!',assignment);
+    logger.info('/demo/assignments: displaying the assignmemt with specified id!',assignment);
     //statsd count for assignment-get hits
     statsdClient.increment('assignment.get',1);
     res.status(200).json(assignment);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: unable to retrieve assignments!',error);
+    logger.error('/demo/assignments: unable to retrieve assignments!',error);
     res.status(500).json({ error: 'Unable to retrieve assignment details' });
   }
 });
 
 // Route to create a new assignment and concatenate user ID and assignment ID
-app.post('/v1/assignments', basicAuth, async (req, res) => {
+app.post('/demo/assignments', basicAuth, async (req, res) => {
   try {
     // Extract the email from the authorization header (Basic Auth)
     const authHeader = req.headers.authorization || '';
@@ -155,13 +155,13 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      logger.error('/v1/assignments: unable to find user!',error);
+      logger.error('/demo/assignments: unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
 
      // Check if the password matches
     //  if (user.password !== password){
-    //   logger.error('/v1/assignments: incorrect credentials!', error);
+    //   logger.error('/demo/assignments: incorrect credentials!', error);
     //   return res.status(401).json({ error: 'Incorrect credentials' });
     // }
 
@@ -193,19 +193,19 @@ app.post('/v1/assignments', basicAuth, async (req, res) => {
       };
 
     // Return the response payload in the JSON response
-    logger.info('/v1/assignments: new assignment created!',responsePayload);
+    logger.info('/demo/assignments: new assignment created!',responsePayload);
     //statsd count for assignment-add hits
     statsdClient.increment('assignment-add',1);
     res.status(201).json(responsePayload);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: assignment cannot be created!',error);
+    logger.error('/demo/assignments: assignment cannot be created!',error);
     res.status(400).json({ error: 'Unable to create assignment' });
   }
 });
 
 // POST endpoint for submitting assignments
-app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
+app.post('/demo/assignments/:id/submissions', basicAuth, async (req, res) => {
   try {
     const { submission_url } = req.body;
     const { id }  = req.params;
@@ -292,7 +292,7 @@ app.post('/v1/assignments/:id/submissions', basicAuth, async (req, res) => {
 });
 
 // Route to update an assignment by ID
-app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
+app.put('/demo/assignments/:id', basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     const { id } = req.params;
@@ -308,7 +308,7 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!user) {
       // Handle the case where the user with the provided email does not exist
-      logger.error('/v1/assignments: Unable to find user!',error);
+      logger.error('/demo/assignments: Unable to find user!',error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -317,7 +317,7 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignment) {
       // Handle the case where the assignment with the provided ID does not exist
-      logger.warn('/v1/assignments: provide correct assignment id!');
+      logger.warn('/demo/assignments: provide correct assignment id!');
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
@@ -330,7 +330,7 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignmentLink) {
       // Handle the case where the user is not authorized to update the assignment
-      logger.error('/v1/assignments: not authorized to update!',error);
+      logger.error('/demo/assignments: not authorized to update!',error);
       return res.status(403).json({ error: 'You are not authorized to update this assignment' });
     }
 
@@ -346,19 +346,19 @@ app.put('/v1/assignments/:id', basicAuth, async (req, res) => {
     });
 
     // Return the updated assignment as a JSON response
-    logger.info('/v1/assignments: updated successfully!',assignment);
+    logger.info('/demo/assignments: updated successfully!',assignment);
     //statsd count for assignment-put hits
     statsdClient.increment('assignment.put',1);
     res.status(200).json(assignment);
   } catch (error) {
     console.error('Error:', error);
-    logger.error('/v1/assignments: Unable to update assignment!',error);
+    logger.error('/demo/assignments: Unable to update assignment!',error);
     res.status(500).json({ error: 'Unable to update assignment' });
   }
 });
 
 // Route to delete an assignment by ID
-app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
+app.delete('/demo/assignments/:id', basicAuth, async (req, res) => {
   try {
     // Extract the assignment ID from the route parameter
     if (Object.keys(req.body).length !== 0) {
@@ -377,7 +377,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!user) {
       // Handle the case where the user with the provided email does not exist
-      logger.error('/v1/assignments: Unable to find user!' + email ,error);
+      logger.error('/demo/assignments: Unable to find user!' + email ,error);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -386,7 +386,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignment) {
       // Handle the case where the assignment with the provided ID does not exist
-      logger.warn('/v1/assignments: provide correct assignment id!');
+      logger.warn('/demo/assignments: provide correct assignment id!');
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
@@ -398,7 +398,7 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
 
     if (!assignmentLink) {
       // Handle the case where the user is not authorized to delete the assignment
-      logger.error('/v1/assignments: not authorized to delete!',error);
+      logger.error('/demo/assignments: not authorized to delete!',error);
       return res.status(403).json({ error: 'You are not authorized to delete this assignment' });
     }
 
@@ -418,12 +418,12 @@ app.delete('/v1/assignments/:id', basicAuth, async (req, res) => {
     await assignmentLink.destroy();
 
     statsdClient.increment('assignment.delete',1);
-    logger.info('/v1/assignments: assignment deleted successfully!');
+    logger.info('/demo/assignments: assignment deleted successfully!');
     res.status(204).json({ message: 'Assignment and Assignment_links record deleted successfully' });
   } catch (error) {
     console.error('Error:', error);
     
-    logger.error('/v1/assignments: Unable to delete assignment!',error);
+    logger.error('/demo/assignments: Unable to delete assignment!',error);
     res.status(404).json({ error: 'Unable to delete assignment' });
   }
 });
